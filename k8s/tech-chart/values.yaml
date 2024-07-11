@@ -1,0 +1,59 @@
+app:
+  name: app-tech
+  replicaCount: 3
+  image:
+    repository: wolwer/app-tech
+    pullPolicy: IfNotPresent
+  service:
+    name: app-tech-service
+    type: NodePort
+    port: 8080
+    targetPort: 8080
+    nodePort: 30000
+  database:
+    url: jdbc:postgresql://tech-challenge.c76hqbfcui3h.us-east-1.rds.amazonaws.com:5432/techchallenge
+    username:
+      secretKeyRef:
+        name: my-secret
+        key: DATA_USERNAME
+    password:
+      secretKeyRef:
+        name: my-secret
+        key: DATA_PASSWORD
+  springProfilesActive: prod
+  resources:
+    requests:
+      cpu: "100m"
+  autoscaling:
+    minReplicas: 1
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 90
+  ingress:
+    name: app-tech-ingress
+    enabled: true
+    host: localhost
+    annotations: {}
+    hosts:
+      - host: localhost
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+  probes:
+    livenessProbe:
+      httpGet:
+        path: /actuator/health
+        port: 8080
+      initialDelaySeconds: 380
+      periodSeconds: 30
+    readinessProbe:
+      httpGet:
+        path: /actuator/health
+        port: 8080
+      initialDelaySeconds: 380
+      periodSeconds: 30
+hpa:
+  name: app-tech-hpa
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 90

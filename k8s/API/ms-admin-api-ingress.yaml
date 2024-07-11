@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ms-admin-api-ingress
+  labels:
+    app: ms-admin-api
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/admin"
+            backend:
+              service:
+                name: ms-admin-api-service
+                port:
+                  number: 8081

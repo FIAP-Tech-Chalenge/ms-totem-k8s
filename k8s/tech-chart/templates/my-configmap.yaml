@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-configmap
+  labels:
+    app: app-tech
+data:
+  DATA_HOST: "tech-challenge.c76hqbfcui3h.us-east-1.rds.amazonaws.com"
+  DATA_PORT: "5432"
+  DATA_DATABASE: "techchallenge"

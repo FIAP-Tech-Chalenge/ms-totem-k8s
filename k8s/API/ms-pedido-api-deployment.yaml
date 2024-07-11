@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-pedido-api
+  labels:
+    app: ms-pedido-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ms-pedido-api
+  template:
+    metadata:
+      labels:
+        app: ms-pedido-api
+    spec:
+      containers:
+        - name: ms-pedido-api
+          image: wolwer/ms-pedido-api
+          ports:
+            - containerPort: 8082
+          env:
+            - name: MONGO_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: MONGO_DB_HOST
+            - name: MONGO_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: MONGO_DB_PORT
+            - name: MONGO_DB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: MONGO_DB_DATABASE
+            - name: MONGO_AUTH_SOURCE
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: MONGO_AUTH_SOURCE
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: SPRING_PROFILES_ACTIVE
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka:9092"
+          resources:
+            requests:
+              cpu: "100m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 180
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8082
+            initialDelaySeconds: 180
+            periodSeconds: 30

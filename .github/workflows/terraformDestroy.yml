@@ -1,0 +1,32 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: '1.0.0'
+
+      - name: Set up AWS environment variables from secrets
+        run: |
+          echo "TF_VAR_aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "TF_VAR_aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "TF_VAR_aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" >> $GITHUB_ENV
+          echo "TF_VAR_regionDefault=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: .
+
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
+        working-directory: .

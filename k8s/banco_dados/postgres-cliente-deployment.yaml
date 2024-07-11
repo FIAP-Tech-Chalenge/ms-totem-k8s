@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-cliente
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-cliente
+  template:
+    metadata:
+      labels:
+        app: postgres-cliente
+    spec:
+      containers:
+        - name: postgres-cliente
+          image: postgres:latest
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: CLIENTE_DATA_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: CLIENTE_DATA_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: CLIENTE_DATA_DATABASE
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-cliente-storage
+      volumes:
+        - name: postgres-cliente-storage
+          persistentVolumeClaim:
+            claimName: postgres-cliente-pvc
