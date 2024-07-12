@@ -1,59 +1,170 @@
-app:
-  name: app-tech
-  replicaCount: 3
-  image:
-    repository: wolwer/app-tech
-    pullPolicy: IfNotPresent
+cliente:
+  name: ms-cliente-api
+  hpa:
+    name: ms-cliente-api-hpa
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
   service:
-    name: app-tech-service
     type: NodePort
     port: 8080
     targetPort: 8080
-    nodePort: 30000
-  database:
-    url: jdbc:postgresql://tech-challenge.c76hqbfcui3h.us-east-1.rds.amazonaws.com:5432/techchallenge
-    username:
-      secretKeyRef:
-        name: my-secret
-        key: DATA_USERNAME
-    password:
-      secretKeyRef:
-        name: my-secret
-        key: DATA_PASSWORD
-  springProfilesActive: prod
-  resources:
-    requests:
-      cpu: "100m"
-  autoscaling:
-    minReplicas: 1
-    maxReplicas: 10
-    targetCPUUtilizationPercentage: 90
+    nodePort: 30001
+  deployment:
+    replicas: 3
+    image: wolwer/ms-cliente-api
+    datasource:
+      url: jdbc:postgresql://postgres-cliente:5432/cliente
+      usernameSecret: CLIENTE_DATA_USER
+      passwordSecret: CLIENTE_DATA_PASSWORD
+    kafkaBootstrapServers: kafka:9092
+    resources:
+      requests:
+        cpu: "100m"
   ingress:
-    name: app-tech-ingress
+    name: ms-cliente-api-ingress
     enabled: true
-    host: localhost
     annotations: {}
     hosts:
-      - host: localhost
+    - host: cliente
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+    tls: []
+  pvc:
+    storage: 1Gi
+
+postgresCliente:
+  replicaCount: 1
+  image:
+    repository: postgres:latest
+  pvc:
+    storage: 1Gi
+  service:
+    port: 5432
+  secrets:
+    CLIENTE_DATA_USER: my-secret
+    CLIENTE_DATA_PASSWORD: my-secret
+  configmap:
+    POSTGRES_DB_CONFIGMAP: my-configmap
+
+admin:
+  name: ms-admin-api
+  hpa:
+    name: ms-admin-api-hpa
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+  service:
+    type: NodePort
+    port: 8081
+    targetPort: 8081
+    nodePort: 30002
+  deployment:
+    replicas: 3
+    image: wolwer/ms-admin-api
+    datasource:
+      url: jdbc:postgresql://postgres-admin:5433/admin
+      usernameSecret: ADMIN_DATA_USER
+      passwordSecret: ADMIN_DATA_PASSWORD
+    kafkaBootstrapServers: kafka:9092
+    resources:
+      requests:
+        cpu: "100m"
+  ingress:
+    name: ms-admin-api-ingress
+    enabled: true
+    annotations: {}
+    hosts:
+      - host: admin
         paths:
           - path: /
             pathType: ImplementationSpecific
     tls: []
-  probes:
-    livenessProbe:
-      httpGet:
-        path: /actuator/health
-        port: 8080
-      initialDelaySeconds: 380
-      periodSeconds: 30
-    readinessProbe:
-      httpGet:
-        path: /actuator/health
-        port: 8080
-      initialDelaySeconds: 380
-      periodSeconds: 30
-hpa:
-  name: app-tech-hpa
-  minReplicas: 1
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 90
+  pvc:
+    storage: 1Gi
+
+postgresAdmin:
+  replicaCount: 1
+  image:
+    repository: postgres:latest
+  pvc:
+    storage: 1Gi
+  service:
+    port: 5433
+  secrets:
+    POSTGRES_USER_SECRET: my-secret
+    POSTGRES_PASSWORD_SECRET: my-secret
+  configmap:
+    POSTGRES_DB_CONFIGMAP: my-configmap
+
+pedido:
+  name: ms-pedido-api
+  hpa:
+    name: ms-pedido-api-hpa
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 80
+  service:
+    type: NodePort
+    port: 8082
+    targetPort: 8082
+    nodePort: 30003
+  deployment:
+    replicas: 3
+    image: wolwer/ms-pedido-api
+    mongo:
+      host: my-mongo-host
+      port: 27017
+      database: pedido
+      authSource: admin
+    kafkaBootstrapServers: kafka:9092
+    resources:
+      requests:
+        cpu: "100m"
+  ingress:
+    name: ms-pedido-api-ingress
+    enabled: true
+    annotations: { }
+    hosts:
+      - host: admin
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: [ ]
+  pvc:
+    storage: 1Gi
+  secrets:
+    MONGO_DB_HOST_SECRET: my-secret
+    MONGO_DB_PORT_SECRET: my-secret
+    MONGO_DB_DATABASE_SECRET: my-secret
+    MONGO_AUTH_SOURCE_SECRET: my-secret
+  configmap:
+    SPRING_PROFILES_ACTIVE_CONFIGMAP: my-configmap
+
+mongodb:
+  replicaCount: 1
+  image:
+    repository: mongo:latest
+  service:
+    port: 27017
+  pvc:
+    storage: 1Gi
+
+zookeeper:
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-zookeeper:latest
+  pvc:
+    storage: 2Gi
+  externalService:
+    enabled: true
+
+kafka:
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-kafka:latest
+  pvc:
+    storage: 10Gi
+  externalService:
+    enabled: true

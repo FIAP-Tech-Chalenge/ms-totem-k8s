@@ -1,0 +1,26 @@
+---
+# k8s/tech-chart/templates/postgres-admin-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-admin-pv
+spec:
+  capacity:
+    storage: {{ .Values.postgresAdmin.pvc.storage }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/postgres-admin"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-admin-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.postgresAdmin.pvc.storage }}
+  storageClassName: hostpath

@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.pedido.name }}
+  labels:
+    app: {{ .Values.pedido.name }}
+spec:
+  replicas: {{ .Values.pedido.deployment.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.pedido.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.pedido.name }}
+    spec:
+      containers:
+        - name: {{ .Values.pedido.name }}
+          image: {{ .Values.pedido.deployment.image }}
+          ports:
+            - containerPort: {{ .Values.pedido.service.port }}
+          env:
+            - name: MONGO_DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
+                  key: MONGO_DB_HOST
+            - name: MONGO_DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
+                  key: MONGO_DB_PORT
+            - name: MONGO_DB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
+                  key: MONGO_DB_DATABASE
+            - name: MONGO_AUTH_SOURCE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
+                  key: MONGO_AUTH_SOURCE
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
+                  key: SPRING_PROFILES_ACTIVE
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: {{ .Values.pedido.deployment.kafkaBootstrapServers }}
+          resources:
+            requests:
+              cpu: {{ .Values.pedido.deployment.resources.requests.cpu }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.pedido.service.port }}
+            initialDelaySeconds: 180
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.pedido.service.port }}
+            initialDelaySeconds: 180
+            periodSeconds: 30

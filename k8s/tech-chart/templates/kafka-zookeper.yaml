@@ -1,0 +1,183 @@
+# k8s/tech-chart/templates/zookeeper-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zookeeper-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.zookeeper.pvc.storage }}
+  storageClassName: hostpath
+---
+# k8s/tech-chart/templates/kafka-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.kafka.pvc.storage }}
+  storageClassName: hostpath
+---
+# k8s/tech-chart/templates/zookeeper-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zookeeper
+spec:
+  serviceName: "zookeeper"
+  replicas: {{ .Values.zookeeper.replicaCount }}
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+        - name: zookeeper
+          image: {{ .Values.zookeeper.image.repository }}
+          ports:
+            - containerPort: 2181
+          volumeMounts:
+            - name: zookeeper-storage
+              mountPath: /var/lib/zookeeper
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "2181"
+  volumeClaimTemplates:
+    - metadata:
+        name: zookeeper-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.zookeeper.pvc.storage }}
+        storageClassName: hostpath
+---
+# k8s/tech-chart/templates/zookeeper-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+spec:
+  ports:
+    - port: 2181
+      name: client
+  selector:
+    app: zookeeper
+  clusterIP: None
+---
+# k8s/tech-chart/templates/kafka-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+spec:
+  serviceName: "kafka"
+  replicas: {{ .Values.kafka.replicaCount }}
+  selector:
+    matchLabels:
+      app: kafka
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      containers:
+        - name: kafka
+          image: {{ .Values.kafka.image.repository }}
+          ports:
+            - containerPort: 9092
+          volumeMounts:
+            - name: kafka-storage
+              mountPath: /var/lib/kafka
+          env:
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: "zookeeper:2181"
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "PLAINTEXT://kafka:9092"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: {{ .Values.kafka.pvc.storage }}
+        storageClassName: hostpath
+---
+# k8s/tech-chart/templates/kafka-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+spec:
+  ports:
+    - port: 9092
+      name: server
+  selector:
+    app: kafka
+  clusterIP: None
+---
+# k8s/tech-chart/templates/zookeeper-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: zookeeper-pv
+spec:
+  capacity:
+    storage: {{ .Values.zookeeper.pvc.storage }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/zookeeper"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: zookeeper-storage-zookeeper-0
+spec:
+  capacity:
+    storage: {{ .Values.zookeeper.pvc.storage }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/zookeeper-storage"
+---
+# k8s/tech-chart/templates/kafka-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-pv
+spec:
+  capacity:
+    storage: {{ .Values.kafka.pvc.storage }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/kafka"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-storage-kafka-0
+spec:
+  capacity:
+    storage: {{ .Values.kafka.pvc.storage }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/kafka-storage"

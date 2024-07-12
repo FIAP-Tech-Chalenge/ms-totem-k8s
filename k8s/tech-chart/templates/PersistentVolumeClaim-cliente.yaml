@@ -1,0 +1,26 @@
+---
+# k8s/tech-chart/templates/postgres-cliente-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-cliente-pv
+spec:
+  capacity:
+    storage: {{ .Values.postgresCliente.pvc.storage }}
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/postgres-cliente"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-cliente-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.postgresCliente.pvc.storage }}
+  storageClassName: hostpath

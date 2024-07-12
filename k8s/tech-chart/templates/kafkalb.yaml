@@ -1,0 +1,25 @@
+# k8s/tech-chart/templates/zookeeper-external-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-external
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 2181
+      targetPort: 2181
+  selector:
+    app: zookeeper
+---
+# k8s/tech-chart/templates/kafka-external-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-external
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9092
+      targetPort: 9092
+  selector:
+    app: kafka

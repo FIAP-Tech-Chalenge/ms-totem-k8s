@@ -2,9 +2,15 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: my-configmap
-  labels:
-    app: app-tech
 data:
-  DATA_HOST: "tech-challenge.c76hqbfcui3h.us-east-1.rds.amazonaws.com"
-  DATA_PORT: "5432"
-  DATA_DATABASE: "techchallenge"
+  CLIENTE_DATA_HOST: "postgres-cliente"
+  CLIENTE_DATA_PORT: "5432"
+  CLIENTE_DATA_DATABASE: "cliente"
+  ADMIN_DATA_HOST: "postgres-admin"
+  ADMIN_DATA_PORT: "5433"
+  ADMIN_DATA_DATABASE: "admin"
+  SPRING_PROFILES_ACTIVE: "hom"
+  MONGO_DB_HOST: "mongodb"
+  MONGO_DB_PORT: "27017"
+  MONGO_DB_DATABASE: "pedidos"
+  MONGO_AUTH_SOURCE: "admin"

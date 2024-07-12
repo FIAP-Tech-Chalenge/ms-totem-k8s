@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.pedido.name }}
+spec:
+  type: {{ .Values.pedido.service.type }}
+  ports:
+    - port: {{ .Values.pedido.service.port }}
+      targetPort: {{ .Values.pedido.service.targetPort }}
+      nodePort: {{ .Values.pedido.service.nodePort }}
+  selector:
+    app: {{ .Values.pedido.name }}

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.cliente.name }}
+  labels:
+    app: {{ .Values.cliente.name }}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: {{ .Values.cliente.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.cliente.name }}
+    spec:
+      containers:
+        - name: {{ .Values.cliente.name }}
+          image: wolwer/{{ .Values.cliente.name }}
+          ports:
+            - containerPort: {{ .Values.cliente.service.port }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-cliente:5432/cliente
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: CLIENTE_DATA_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: CLIENTE_DATA_PASSWORD
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: SPRING_PROFILES_ACTIVE
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka:9092"
+          resources:
+            requests:
+              cpu: "100m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.cliente.service.port }}
+            initialDelaySeconds: 180
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.cliente.service.port }}
+            initialDelaySeconds: 180
+            periodSeconds: 30

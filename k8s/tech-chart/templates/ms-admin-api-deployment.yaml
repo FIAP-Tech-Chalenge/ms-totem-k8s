@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.admin.name }}
+  labels:
+    app: {{ .Values.admin.name }}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: {{ .Values.admin.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.admin.name }}
+    spec:
+      containers:
+        - name: {{ .Values.admin.name }}
+          image: wolwer/{{ .Values.admin.name }}
+          ports:
+            - containerPort: {{ .Values.admin.service.port }}
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres-admin:5433/admin
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: ADMIN_DATA_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: ADMIN_DATA_PASSWORD
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: my-configmap
+                  key: SPRING_PROFILES_ACTIVE
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka:9092"
+          resources:
+            requests:
+              cpu: "100m"
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.admin.service.port }}
+            initialDelaySeconds: 180
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: {{ .Values.admin.service.port }}
+            initialDelaySeconds: 180
+            periodSeconds: 30

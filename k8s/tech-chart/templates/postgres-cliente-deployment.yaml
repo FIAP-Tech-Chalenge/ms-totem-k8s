@@ -1,0 +1,45 @@
+# k8s/tech-chart/templates/postgres-cliente-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-cliente
+spec:
+  replicas: {{ .Values.postgresCliente.replicaCount }}
+  selector:
+    matchLabels:
+      app: postgres-cliente
+  template:
+    metadata:
+      labels:
+        app: postgres-cliente
+    spec:
+      containers:
+        - name: postgres-cliente
+          image: {{ .Values.postgresCliente.image.repository }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: CLIENTE_DATA_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: CLIENTE_DATA_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.postgresCliente.configmap.POSTGRES_DB_CONFIGMAP }}
+                  key: CLIENTE_DATA_DATABASE
+          ports:
+            - containerPort: {{ .Values.postgresCliente.service.port }}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-cliente-storage
+      volumes:
+        - name: postgres-cliente-storage
+          persistentVolumeClaim:
+            claimName: postgres-cliente-pvc
+
+

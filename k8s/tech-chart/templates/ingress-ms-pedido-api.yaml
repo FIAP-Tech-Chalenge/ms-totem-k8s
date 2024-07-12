@@ -1,0 +1,24 @@
+{{- if .Values.pedido.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.pedido.name }}-ingress
+  labels:
+    app: {{ .Values.pedido.name }}
+spec:
+  rules:
+    {{- range .Values.pedido.ingress.hosts }}
+    - host: {{ .host }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $.Values.pedido.name }}
+                port:
+                  number: {{ $.Values.pedido.service.port }}
+          {{- end }}
+    {{- end }}
+{{- end }}

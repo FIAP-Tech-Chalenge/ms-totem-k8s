@@ -1,0 +1,27 @@
+# k8s/tech-chart/templates/mongodb-pedido-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  replicas: {{ .Values.mongodb.replicaCount }}
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - name: mongodb
+          image: {{ .Values.mongodb.image.repository }}
+          ports:
+            - containerPort: {{ .Values.mongodb.service.port }}
+          volumeMounts:
+            - mountPath: /data/db
+              name: mongodb-storage
+      volumes:
+        - name: mongodb-storage
+          persistentVolumeClaim:
+            claimName: mongo-pedido-pvc
