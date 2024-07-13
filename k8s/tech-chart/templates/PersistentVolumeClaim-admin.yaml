@@ -1,5 +1,3 @@
----
-# k8s/tech-chart/templates/postgres-admin-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -16,7 +14,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-admin-pvc
+  name: {{ .Values.postgresAdmin.pvc.name }}
 spec:
   accessModes:
     - ReadWriteOnce

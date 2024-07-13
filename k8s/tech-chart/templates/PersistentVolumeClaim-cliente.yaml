@@ -1,5 +1,3 @@
----
-# k8s/tech-chart/templates/postgres-cliente-pv.yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -16,7 +14,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-cliente-pvc
+  name: {{ .Values.postgresCliente.pvc.name }}
 spec:
   accessModes:
     - ReadWriteOnce

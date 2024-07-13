@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: postgres-cliente
+  name: {{ .Values.postgresCliente.name }}
 spec:
   selector:
-    app: postgres-cliente
+    app: {{ .Values.postgresCliente.name }}
   ports:
     - protocol: TCP
       port: {{ .Values.postgresCliente.service.port }}

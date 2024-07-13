@@ -16,7 +16,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mongo-pedido-pvc
+  name: {{ .Values.mongodb.pvc.name }}
 spec:
   accessModes:
     - ReadWriteOnce

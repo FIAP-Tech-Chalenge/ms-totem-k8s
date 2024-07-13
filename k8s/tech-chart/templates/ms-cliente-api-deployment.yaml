@@ -2,10 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.cliente.name }}
-  labels:
-    app: {{ .Values.cliente.name }}
 spec:
-  replicas: 3
+  replicas: {{ .Values.cliente.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Values.cliente.name }}
@@ -16,32 +14,29 @@ spec:
     spec:
       containers:
         - name: {{ .Values.cliente.name }}
-          image: wolwer/{{ .Values.cliente.name }}
+          image: "{{ .Values.cliente.image.repository }}:{{ .Values.cliente.image.tag }}"
           ports:
             - containerPort: {{ .Values.cliente.service.port }}
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres-cliente:5432/cliente
+              value: {{ .Values.cliente.datasource.url }}
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: my-secret
-                  key: CLIENTE_DATA_USER
+                  name: {{ .Values.cliente.datasource.username.secretKeyRef.name }}
+                  key: {{ .Values.cliente.datasource.username.secretKeyRef.key }}
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: my-secret
-                  key: CLIENTE_DATA_PASSWORD
+                  name: {{ .Values.cliente.datasource.password.secretKeyRef.name }}
+                  key: {{ .Values.cliente.datasource.password.secretKeyRef.key }}
             - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: my-configmap
-                  key: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.cliente.springProfilesActive }}
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "kafka:9092"
+              value: {{ .Values.cliente.kafkaBootstrapServers }}
           resources:
             requests:
-              cpu: "100m"
+              cpu: "{{ .Values.cliente.resources.requests.cpu }}"
           livenessProbe:
             httpGet:
               path: /actuator/health
