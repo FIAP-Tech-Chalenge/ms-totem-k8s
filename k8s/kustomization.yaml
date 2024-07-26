@@ -1,0 +1,5 @@
+resources:
+    - API
+    - Kafka
+    - banco_dados
+    - k8s
