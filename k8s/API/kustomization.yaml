@@ -11,3 +11,4 @@ resources:
   - ms-pedido-api-deployment.yaml
   - ms-pedido-api-service.yaml
   - ms-pedido-api-ingress.yaml
+  - lbms.yaml
