@@ -5,7 +5,7 @@ metadata:
   labels:
     app: ms-admin-api
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: ms-admin-api
@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: ms-admin-api
-          image: wolwer/ms-admin-api
+          image: wolwer/ms-admin-api:v1.0.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
           env:

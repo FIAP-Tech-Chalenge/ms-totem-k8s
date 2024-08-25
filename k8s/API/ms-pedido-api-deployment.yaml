@@ -5,7 +5,7 @@ metadata:
   labels:
     app: ms-pedido-api
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: ms-pedido-api
@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: ms-pedido-api
-          image: wolwer/ms-pedido-api
+          image: wolwer/ms-pedido-api:v1.0.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
           env:
