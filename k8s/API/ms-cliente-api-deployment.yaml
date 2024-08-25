@@ -5,7 +5,7 @@ metadata:
   labels:
     app: ms-cliente-api
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: ms-cliente-api
@@ -16,8 +16,7 @@ spec:
     spec:
       containers:
         - name: ms-cliente-api
-          image: wolwer/ms-cliente-api:v1.0.0
-          imagePullPolicy: Always
+          image: wolwer/ms-cliente-api
           ports:
             - containerPort: 8080
           env:

@@ -1,21 +1,20 @@
-# k8s/tech-chart/templates/postgres-admin-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-admin
+  name: {{ .Values.postgresAdmin.name }}
 spec:
   replicas: {{ .Values.postgresAdmin.replicaCount }}
   selector:
     matchLabels:
-      app: postgres-admin
+      app: {{ .Values.postgresAdmin.name }}
   template:
     metadata:
       labels:
-        app: postgres-admin
+        app: {{ .Values.postgresAdmin.name }}
     spec:
       containers:
-        - name: postgres-admin
-          image: {{ .Values.postgresAdmin.image.repository }}
+        - name: {{ .Values.postgresAdmin.name }}
+          image: "{{ .Values.postgresAdmin.image.repository }}:{{ .Values.postgresAdmin.image.tag }}"
           env:
             - name: POSTGRES_USER
               valueFrom:
@@ -30,7 +29,7 @@ spec:
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.postgresAdmin.configmap.POSTGRES_DB_CONFIGMAP }}
+                  name: my-configmap
                   key: ADMIN_DATA_DATABASE
           ports:
             - containerPort: {{ .Values.postgresAdmin.service.port }}
@@ -40,4 +39,4 @@ spec:
       volumes:
         - name: postgres-admin-storage
           persistentVolumeClaim:
-            claimName: postgres-admin-pvc
+            claimName: {{ .Values.postgresAdmin.pvc.name }}

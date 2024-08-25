@@ -1,37 +1,36 @@
-# k8s/tech-chart/templates/postgres-cliente-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres-cliente
+  name: {{ .Values.postgresCliente.name }}
 spec:
   replicas: {{ .Values.postgresCliente.replicaCount }}
   selector:
     matchLabels:
-      app: postgres-cliente
+      app: {{ .Values.postgresCliente.name }}
   template:
     metadata:
       labels:
-        app: postgres-cliente
+        app: {{ .Values.postgresCliente.name }}
     spec:
       containers:
-        - name: postgres-cliente
-          image: {{ .Values.postgresCliente.image.repository }}
+        - name: {{ .Values.postgresCliente.name }}
+          image: "{{ .Values.postgresCliente.image.repository }}:{{ .Values.postgresCliente.image.tag }}"
           env:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: my-secret
-                  key: CLIENTE_DATA_USER
+                  name: {{ .Values.postgresCliente.env.user.secretKeyRef.name }}
+                  key: {{ .Values.postgresCliente.env.user.secretKeyRef.key }}
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: my-secret
-                  key: CLIENTE_DATA_PASSWORD
+                  name: {{ .Values.postgresCliente.env.password.secretKeyRef.name }}
+                  key: {{ .Values.postgresCliente.env.password.secretKeyRef.key }}
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Values.postgresCliente.configmap.POSTGRES_DB_CONFIGMAP }}
-                  key: CLIENTE_DATA_DATABASE
+                  name: {{ .Values.postgresCliente.env.db.configMapKeyRef.name }}
+                  key: {{ .Values.postgresCliente.env.db.configMapKeyRef.key }}
           ports:
             - containerPort: {{ .Values.postgresCliente.service.port }}
           volumeMounts:
@@ -40,6 +39,4 @@ spec:
       volumes:
         - name: postgres-cliente-storage
           persistentVolumeClaim:
-            claimName: postgres-cliente-pvc
-
-
+            claimName: {{ .Values.postgresCliente.pvc.name }}

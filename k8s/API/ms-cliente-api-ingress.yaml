@@ -10,7 +10,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "/"
+            path: "/clientes"
             backend:
               service:
                 name: ms-cliente-api-service

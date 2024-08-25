@@ -8,3 +8,18 @@ spec:
   resources:
     requests:
       storage: 1Gi
+  storageClassName: hostpath
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongo-pedido-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/mongo"

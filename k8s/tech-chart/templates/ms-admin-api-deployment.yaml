@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Values.admin.name }}
 spec:
-  replicas: 3
+  replicas: {{ .Values.admin.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Values.admin.name }}
@@ -16,12 +16,12 @@ spec:
     spec:
       containers:
         - name: {{ .Values.admin.name }}
-          image: wolwer/{{ .Values.admin.name }}
+          image: "{{ .Values.admin.image.repository }}:{{ .Values.admin.image.tag }}"
           ports:
             - containerPort: {{ .Values.admin.service.port }}
           env:
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://postgres-admin:5433/admin
+              value: {{ .Values.admin.datasource.url }}
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -33,15 +33,12 @@ spec:
                   name: my-secret
                   key: ADMIN_DATA_PASSWORD
             - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: my-configmap
-                  key: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.admin.springProfilesActive }}
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "kafka:9092"
+              value: {{ .Values.admin.kafkaBootstrapServers }}
           resources:
             requests:
-              cpu: "100m"
+              cpu: "{{ .Values.admin.resources.requests.cpu }}"
           livenessProbe:
             httpGet:
               path: /actuator/health

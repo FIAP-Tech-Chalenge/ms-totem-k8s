@@ -1,5 +1,9 @@
 cliente:
   name: ms-cliente-api
+  replicaCount: 3
+  image:
+    repository: wolwer/ms-cliente-api
+    tag: latest
   hpa:
     name: ms-cliente-api-hpa
     minReplicas: 1
@@ -13,12 +17,19 @@ cliente:
   deployment:
     replicas: 3
     image: wolwer/ms-cliente-api
-    datasource:
-      url: jdbc:postgresql://postgres-cliente:5432/cliente
-      usernameSecret: CLIENTE_DATA_USER
-      passwordSecret: CLIENTE_DATA_PASSWORD
-    kafkaBootstrapServers: kafka:9092
-    resources:
+  datasource:
+    url: jdbc:postgresql://postgres-cliente:5432/cliente
+    username:
+      secretKeyRef:
+        name: my-secret
+        key: CLIENTE_DATA_USER
+    password:
+      secretKeyRef:
+        name: my-secret
+        key: CLIENTE_DATA_PASSWORD
+  springProfilesActive: hom
+  kafkaBootstrapServers: kafka:9092
+  resources:
       requests:
         cpu: "100m"
   ingress:
@@ -31,25 +42,38 @@ cliente:
         - path: /
           pathType: ImplementationSpecific
     tls: []
-  pvc:
-    storage: 1Gi
 
 postgresCliente:
+  name: postgres-cliente
   replicaCount: 1
   image:
-    repository: postgres:latest
-  pvc:
-    storage: 1Gi
+    repository: postgres
+    tag: latest
+  env:
+    user:
+      secretKeyRef:
+        name: my-secret
+        key: CLIENTE_DATA_USER
+    password:
+      secretKeyRef:
+        name: my-secret
+        key: CLIENTE_DATA_PASSWORD
+    db:
+      configMapKeyRef:
+        name: my-configmap
+        key: CLIENTE_DATA_DATABASE
   service:
     port: 5432
-  secrets:
-    CLIENTE_DATA_USER: my-secret
-    CLIENTE_DATA_PASSWORD: my-secret
-  configmap:
-    POSTGRES_DB_CONFIGMAP: my-configmap
+  pvc:
+    name: postgres-cliente-pvc
+    storage: 1Gi
 
 admin:
   name: ms-admin-api
+  replicaCount: 3
+  image:
+    repository: wolwer/ms-admin-api
+    tag: latest
   hpa:
     name: ms-admin-api-hpa
     minReplicas: 1
@@ -63,14 +87,21 @@ admin:
   deployment:
     replicas: 3
     image: wolwer/ms-admin-api
-    datasource:
-      url: jdbc:postgresql://postgres-admin:5433/admin
-      usernameSecret: ADMIN_DATA_USER
-      passwordSecret: ADMIN_DATA_PASSWORD
-    kafkaBootstrapServers: kafka:9092
-    resources:
-      requests:
-        cpu: "100m"
+  datasource:
+    url: jdbc:postgresql://postgres-admin:5433/admin
+    username:
+      secretKeyRef:
+        name: my-secret
+        key: ADMIN_DATA_USER
+    password:
+      secretKeyRef:
+        name: my-secret
+        key: ADMIN_DATA_PASSWORD
+  springProfilesActive: hom
+  kafkaBootstrapServers: kafka:9092
+  resources:
+    requests:
+      cpu: "100m"
   ingress:
     name: ms-admin-api-ingress
     enabled: true
@@ -81,28 +112,41 @@ admin:
           - path: /
             pathType: ImplementationSpecific
     tls: []
-  pvc:
-    storage: 1Gi
 
 postgresAdmin:
+  name: postgres-admin
   replicaCount: 1
   image:
-    repository: postgres:latest
-  pvc:
-    storage: 1Gi
+    repository: postgres
+    tag: latest
+  env:
+    user:
+      secretKeyRef:
+        name: my-secret
+        key: ADMIN_DATA_USER
+    password:
+      secretKeyRef:
+        name: my-secret
+        key: ADMIN_DATA_PASSWORD
+    db:
+      configMapKeyRef:
+        name: my-configmap
+        key: ADMIN_DATA_DATABASE
   service:
     port: 5433
-  secrets:
-    POSTGRES_USER_SECRET: my-secret
-    POSTGRES_PASSWORD_SECRET: my-secret
-  configmap:
-    POSTGRES_DB_CONFIGMAP: my-configmap
+  pvc:
+    name: postgres-admin-pvc
+    storage: 1Gi
 
 pedido:
   name: ms-pedido-api
+  replicaCount: 3
+  image:
+    repository: wolwer/ms-pedido-api
+    tag: latest
   hpa:
     name: ms-pedido-api-hpa
-    minReplicas: 2
+    minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 80
   service:
@@ -113,42 +157,42 @@ pedido:
   deployment:
     replicas: 3
     image: wolwer/ms-pedido-api
-    mongo:
-      host: my-mongo-host
-      port: 27017
-      database: pedido
-      authSource: admin
-    kafkaBootstrapServers: kafka:9092
-    resources:
-      requests:
-        cpu: "100m"
+  datasource:
+    url: mongodb://mongo-pedido:27017/pedido
+    username:
+      secretKeyRef:
+        name: my-secret
+        key: PEDIDO_DATA_USER
+    password:
+      secretKeyRef:
+        name: my-secret
+        key: PEDIDO_DATA_PASSWORD
+  springProfilesActive: hom
+  kafkaBootstrapServers: kafka:9092
+  resources:
+    requests:
+      cpu: "100m"
   ingress:
     name: ms-pedido-api-ingress
     enabled: true
-    annotations: { }
+    annotations: {}
     hosts:
-      - host: admin
+      - host: pedido
         paths:
           - path: /
             pathType: ImplementationSpecific
-    tls: [ ]
-  pvc:
-    storage: 1Gi
-  secrets:
-    MONGO_DB_HOST_SECRET: my-secret
-    MONGO_DB_PORT_SECRET: my-secret
-    MONGO_DB_DATABASE_SECRET: my-secret
-    MONGO_AUTH_SOURCE_SECRET: my-secret
-  configmap:
-    SPRING_PROFILES_ACTIVE_CONFIGMAP: my-configmap
+    tls: []
+
 
 mongodb:
+  name: mongo-pedido
   replicaCount: 1
   image:
     repository: mongo:latest
   service:
     port: 27017
   pvc:
+    name: mongo-pedido-pvc
     storage: 1Gi
 
 zookeeper:

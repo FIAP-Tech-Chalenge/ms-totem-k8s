@@ -8,6 +8,7 @@ spec:
   resources:
     requests:
       storage: 2Gi
+  storageClassName: hostpath
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -19,6 +20,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  storageClassName: hostpath
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -55,6 +57,7 @@ spec:
         resources:
           requests:
             storage: 2Gi
+        storageClassName: hostpath
 ---
 apiVersion: v1
 kind: Service
@@ -107,6 +110,7 @@ spec:
         resources:
           requests:
             storage: 10Gi
+        storageClassName: hostpath
 ---
 apiVersion: v1
 kind: Service
@@ -119,3 +123,58 @@ spec:
   selector:
     app: kafka
   clusterIP: None
+
+---
+# k8s/tech-chart/templates/zookeeper-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: zookeeper-pv
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/zookeeper"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: zookeeper-storage-zookeeper-0
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/zookeeper-storage"
+---
+# k8s/tech-chart/templates/kafka-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/kafka"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kafka-storage-kafka-0
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: hostpath
+  hostPath:
+    path: "/mnt/data/kafka-storage"

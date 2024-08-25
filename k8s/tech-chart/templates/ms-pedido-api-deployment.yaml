@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Values.pedido.name }}
 spec:
-  replicas: {{ .Values.pedido.deployment.replicas }}
+  replicas: {{ .Values.pedido.replicaCount }}
   selector:
     matchLabels:
       app: {{ .Values.pedido.name }}
@@ -16,40 +16,29 @@ spec:
     spec:
       containers:
         - name: {{ .Values.pedido.name }}
-          image: {{ .Values.pedido.deployment.image }}
+          image: "{{ .Values.pedido.image.repository }}:{{ .Values.pedido.image.tag }}"
           ports:
             - containerPort: {{ .Values.pedido.service.port }}
           env:
-            - name: MONGO_DB_HOST
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.pedido.datasource.url }}
+            - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
-                configMapKeyRef:
-                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
-                  key: MONGO_DB_HOST
-            - name: MONGO_DB_PORT
+                secretKeyRef:
+                  name: {{ .Values.pedido.datasource.username.secretKeyRef.name }}
+                  key: {{ .Values.pedido.datasource.username.secretKeyRef.key }}
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
-                configMapKeyRef:
-                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
-                  key: MONGO_DB_PORT
-            - name: MONGO_DB_DATABASE
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
-                  key: MONGO_DB_DATABASE
-            - name: MONGO_AUTH_SOURCE
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
-                  key: MONGO_AUTH_SOURCE
+                secretKeyRef:
+                  name: {{ .Values.pedido.datasource.password.secretKeyRef.name }}
+                  key: {{ .Values.pedido.datasource.password.secretKeyRef.key }}
             - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ .Values.pedido.configmap.SPRING_PROFILES_ACTIVE_CONFIGMAP }}
-                  key: SPRING_PROFILES_ACTIVE
+              value: {{ .Values.pedido.springProfilesActive }}
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: {{ .Values.pedido.deployment.kafkaBootstrapServers }}
+              value: {{ .Values.pedido.kafkaBootstrapServers }}
           resources:
             requests:
-              cpu: {{ .Values.pedido.deployment.resources.requests.cpu }}
+              cpu: "{{ .Values.pedido.resources.requests.cpu }}"
           livenessProbe:
             httpGet:
               path: /actuator/health
