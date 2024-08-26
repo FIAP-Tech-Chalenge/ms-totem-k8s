@@ -2,10 +2,9 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
   name: ms-pedido-api
-  namespace: flux-system
 spec:
   image: wolwer/ms-pedido-api
-  interval: 5m
+  interval: 1m
 
 ---
 
@@ -13,13 +12,12 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
 metadata:
   name: ms-pedido-api-policy
-  namespace: flux-system
 spec:
   imageRepositoryRef:
     name: ms-pedido-api
   policy:
     semver:
-      range: 1.0.x
+      range: ">=x1.0.0"
 
 ---
 
@@ -27,23 +25,33 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageUpdateAutomation
 metadata:
   name: ms-pedido-api-update
-  namespace: flux-system
 spec:
-  interval: 1m
-  sourceRef:
-    kind: GitRepository
-    name: ms-pedido-api
   git:
     checkout:
       ref:
         branch: main
-    url: https://github.com/FIAP-Tech-Chalenge/ms-pedido-api
     commit:
       author:
         email: ricardo@dtmm.com.br
         name: FluxCD
-      messageTemplate: 'Update image to {{ .ImageName }}:{{ .NewTag }}'
+      messageTemplate: "Update image to {{ .ImageName }}:{{ .NewTag }}"
     push:
-      branch: flux-updates
+      branch: main
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: ms-pedido-api
   update:
     strategy: Setters
+
+---
+
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: ms-pedido-api
+spec:
+  interval: 1m
+  url: https://github.com/FIAP-Tech-Chalenge/ms-pedido-api.git
+  ref:
+    branch: main

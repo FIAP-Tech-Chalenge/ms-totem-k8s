@@ -2,24 +2,22 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
   name: ms-admin-api
-  namespace: flux-system
 spec:
   image: wolwer/ms-admin-api
-  interval: 5m
+  interval: 1m
 
 ---
 
-apiVersion: image.toolkit.fluxcd.io/v1beta2
+apiVersion: image.toolkit.fluxcd.io/v1beta1
 kind: ImagePolicy
 metadata:
   name: ms-admin-api-policy
-  namespace: flux-system
 spec:
   imageRepositoryRef:
     name: ms-admin-api
   policy:
     semver:
-      range: 1.0.x
+      range: ">=1.0.0"
 
 ---
 
@@ -27,23 +25,34 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageUpdateAutomation
 metadata:
   name: ms-admin-api-update
-  namespace: flux-system
 spec:
-  interval: 1m
-  sourceRef:
-    kind: GitRepository
-    name: ms-admin-api
   git:
     checkout:
       ref:
         branch: main
-    url: https://github.com/FIAP-Tech-Chalenge/ms-admin-api
     commit:
       author:
         email: ricardo@dtmm.com.br
         name: FluxCD
-      messageTemplate: 'Update image to {{ .ImageName }}:{{ .NewTag }}'
+      messageTemplate: "Update image to {{ .ImageName }}:{{ .NewTag }}"
     push:
-      branch: flux-updates
+      branch: main
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: ms-admin-api
   update:
     strategy: Setters
+
+
+---
+
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: ms-admin-api
+spec:
+  interval: 1m
+  url: https://github.com/FIAP-Tech-Chalenge/ms-admin-api.git
+  ref:
+    branch: main
