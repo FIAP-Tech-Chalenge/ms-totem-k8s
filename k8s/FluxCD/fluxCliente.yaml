@@ -32,11 +32,12 @@ spec:
   interval: 1m
   sourceRef:
     kind: GitRepository
-    name: my-repo
+    name: ms-cliente-api
   git:
     checkout:
       ref:
         branch: main
+    url: https://github.com/FIAP-Tech-Chalenge/ms-cliente-api
     commit:
       author:
         email: ricardo@dtmm.com.br
