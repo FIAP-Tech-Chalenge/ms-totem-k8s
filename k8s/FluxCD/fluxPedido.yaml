@@ -39,7 +39,7 @@ spec:
         branch: main
     commit:
       author:
-        email: flux@example.com
+        email: ricardo@dtmm.com.br
         name: FluxCD
       messageTemplate: 'Update image to {{ .ImageName }}:{{ .NewTag }}'
     push:

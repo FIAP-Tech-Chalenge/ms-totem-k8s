@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: ms-pedido-api
-          image: wolwer/ms-pedido-api
+          image: wolwer/ms-pedido-api:v1.0.0
           ports:
             - containerPort: 8082
           env:

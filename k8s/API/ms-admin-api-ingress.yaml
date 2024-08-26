@@ -10,7 +10,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "/"
+            path: "/admin"
             backend:
               service:
                 name: ms-admin-api-service

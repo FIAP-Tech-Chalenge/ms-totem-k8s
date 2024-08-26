@@ -10,7 +10,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "/"
+            path: "/pedido"
             backend:
               service:
                 name: ms-cliente-api-service

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: ms-cliente-api
-          image: wolwer/ms-cliente-api
+          image: wolwer/ms-cliente-api:v1.0.1
           ports:
             - containerPort: 8080
           env:

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: ms-admin-api
-          image: wolwer/ms-admin-api
+          image: wolwer/ms-admin-api:v1.0.1
           ports:
             - containerPort: 8081
           env:
