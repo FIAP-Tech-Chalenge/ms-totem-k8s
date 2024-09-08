@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: ms-pedido-api
-          image: wolwer/ms-pedido-api:v1.0.0
+          image: wolwer/ms-pedido-api:v1.0.1 # {"$imagepolicy": "flux-system:ms-pedido-api"}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
           env:

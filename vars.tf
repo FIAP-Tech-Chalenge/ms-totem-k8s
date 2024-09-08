@@ -3,7 +3,7 @@ variable "regionDefault" {
 }
 
 variable "labRole" {
-  default = "arn:aws:iam::002068128729:role/LabRole"
+  default = "arn:aws:iam::964124800382:role/LabRole"
 }
 
 variable "projectName" {
@@ -11,19 +11,19 @@ variable "projectName" {
 }
 
 variable "subnetA" {
-  default = "subnet-0283bd52c9aef524f"
+  default = "subnet-01b0806ee05739c86"
 }
 
 variable "subnetB" {
-  default = "subnet-00c109f55cbc5fe78"
+  default = "subnet-051aee4b3b1074344"
 }
 
 variable "subnetC" {
-  default = "subnet-050c443c89fecac83"
+  default = "subnet-059cf475652425736"
 }
 
 variable "vpcId" {
-  default = "vpc-03df2900fc85ea75b"
+  default = "vpc-08ee1cdb9cb41060f"
 }
 
 variable "instanceType" {
@@ -31,7 +31,7 @@ variable "instanceType" {
 }
 
 variable "principalArn" {
-  default = "arn:aws:iam::002068128729:role/voclabs"
+  default = "arn:aws:iam::964124800382:role/voclabs"
 }
 
 variable "policyArn" {

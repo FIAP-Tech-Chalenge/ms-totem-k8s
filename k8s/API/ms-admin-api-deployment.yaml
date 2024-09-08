@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: ms-admin-api
-          image: wolwer/ms-admin-api:v1.0.1
+          image: wolwer/ms-admin-api:v1.0.4 # {"$imagepolicy": "flux-system:ms-admin-api"}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8081
           env:

@@ -11,47 +11,42 @@ spec:
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
 metadata:
-  name: ms-pedido-api-policy
+  name: ms-pedido-api
 spec:
   imageRepositoryRef:
     name: ms-pedido-api
   policy:
     semver:
-      range: ">=x1.0.0"
+      range: ">=1.0.0"
 
 ---
 
-apiVersion: image.toolkit.fluxcd.io/v1beta2
-kind: ImageUpdateAutomation
-metadata:
-  name: ms-pedido-api-update
-spec:
-  git:
-    checkout:
-      ref:
-        branch: main
-    commit:
-      author:
-        email: ricardo@dtmm.com.br
-        name: FluxCD
-      messageTemplate: "Update image to {{ .ImageName }}:{{ .NewTag }}"
-    push:
-      branch: main
-  interval: 1m
-  sourceRef:
-    kind: GitRepository
-    name: ms-pedido-api
-  update:
-    strategy: Setters
-
----
-
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
 metadata:
   name: ms-pedido-api
+  namespace: default
 spec:
   interval: 1m
   url: https://github.com/FIAP-Tech-Chalenge/ms-pedido-api.git
   ref:
     branch: main
+
+---
+
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: ms-pedido-api
+  namespace: default
+spec:
+  interval: 1m
+  path: ./k8s/FluxCD
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: ms-pedido-api
+  images:
+    - name: wolwer/ms-pedido-api
+      newTag: "{{ .ImagePolicy.latestImage }}"
+  targetNamespace: default
