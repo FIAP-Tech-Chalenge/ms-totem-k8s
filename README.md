@@ -1,6 +1,33 @@
+
+## Como rodar o projeto
+
+Fazer a conexão com a AWS e rodar o comando abaixo para criar a infraestrutura:
+
+```bash
+terraform init
+terraform plan
+terraform apply
+```
+
+Para rodar o projeto com o Kubernete, basta executar os comandos abaixo:
+
+```bash
+kubectl apply -f https://github.com/fluxcd/kustomize-controller/releases/latest/download/kustomize-controller.crds.yaml
+kubectl apply -f https://github.com/fluxcd/flux2/releases/latest/download/install.yaml
+kubectl get crds | Select-String -Pattern "kustomizations.kustomize.toolkit.fluxcd.io"
+kubectl apply -k https://github.com/fluxcd/flux2/manifests/crds
+kubectl apply -k .
+```
+
+Para finalizar a execução do Kubernetes, basta rodar o comando abaixo:
+
+```bash
+kubectl delete -k .
+```
+
 ## Justificativa para o Uso do Padrão Saga Coreografado
 
-Na construção desta aplicação, optamos por utilizar o padrão Saga Coreografado para gerenciar transações distribuídas. Essa escolha foi fundamentada por diversos fatores, que incluem:
+Na construção desta aplicação, optamos por utilizar o padrão Saga Coreografado no 3 microserviços para gerenciar transações distribuídas. Essa escolha foi fundamentada por diversos fatores, que incluem:
 
 ### 1. Descentralização e Independência dos Serviços
 No padrão Saga Coreografado, não existe um orquestrador central que controla o fluxo das transações. Cada serviço é responsável por decidir quando e como participar de uma saga, baseando-se em eventos. Isso aumenta a independência dos serviços, reduz o acoplamento e facilita a escalabilidade, permitindo que cada serviço evolua e seja implantado de forma independente.
