@@ -1,3 +1,10 @@
+## Links Importantes
+
+- **GitHub (microserviços e orquestração):** [Link para o repositório](https://github.com/FIAP-Tech-Chalenge/ms-totem-k8s)
+- **Relatório OWASP ZAP:** [Link para o relatório](https://drive.google.com/drive/folders/12B4BEf6QRTOrIo5PXGtPIp7e2okqhObo?usp=sharing)
+- **Relatório RIPD:** [Link para o relatório](https://drive.google.com/file/d/1PjIPNTeq2-gQv2ynIatFeNHw-eWlvvWk/view?usp=sharing)
+- **Desenho da Arquitetura:** [Link para o desenho](https://drive.google.com/file/d/1Sw2ohs7x8SZ14IKkEqM6y-gUkFzgDqO7/view?usp=drive_link)
+- **Vídeo:** _Link para o vídeo_ (a ser adicionado)
 
 ## Como rodar o projeto
 
@@ -9,7 +16,7 @@ terraform plan
 terraform apply
 ```
 
-Para rodar o projeto com o Kubernete, basta executar os comandos abaixo:
+Para rodar o projeto com o Kubernetes, basta executar os comandos abaixo:
 
 ```bash
 kubectl apply -f https://github.com/fluxcd/kustomize-controller/releases/latest/download/kustomize-controller.crds.yaml
@@ -27,10 +34,10 @@ kubectl delete -k .
 
 ## Justificativa para o Uso do Padrão Saga Coreografado
 
-Na construção desta aplicação, optamos por utilizar o padrão Saga Coreografado no 3 microserviços para gerenciar transações distribuídas. Essa escolha foi fundamentada por diversos fatores, que incluem:
+Na construção desta aplicação, optamos por utilizar o padrão Saga Coreografado em três microserviços para gerenciar transações distribuídas. Essa escolha foi fundamentada por diversos fatores, que incluem:
 
 ### 1. Descentralização e Independência dos Serviços
-No padrão Saga Coreografado, não existe um orquestrador central que controla o fluxo das transações. Cada serviço é responsável por decidir quando e como participar de uma saga, baseando-se em eventos. Isso aumenta a independência dos serviços, reduz o acoplamento e facilita a escalabilidade, permitindo que cada serviço evolua e seja implantado de forma independente.
+No padrão Saga Coreografado, não existe um orquestrador central que controla o fluxo das transações. Cada serviço decide quando e como participar de uma saga, baseando-se em eventos. Isso aumenta a independência dos serviços, reduz o acoplamento e facilita a escalabilidade, permitindo que cada serviço evolua e seja implantado de forma independente.
 
 ### 2. Facilidade de Escalabilidade
 A coreografia permite uma melhor escalabilidade, pois não há um ponto único de controle. Cada serviço opera de maneira autônoma, processando eventos e executando suas operações. Esse modelo é particularmente vantajoso em arquiteturas de microserviços, onde diferentes serviços podem ter diferentes necessidades de escalabilidade.
